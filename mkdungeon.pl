@@ -2,23 +2,24 @@
 
 use strict;
 
-use Games::MapMaker::Cave;
-use Games::MapMaker::Dungeon;
+use Games::DungeonBuilder::Cave;
+use Games::DungeonBuilder::Dungeon;
 
-my $u = Games::MapMaker::Cave->new( 
+my $grid = Games::DungeonBuilder::Grid->new;
+
+Games::DungeonBuilder::Cave->new( 
     target_density => 0.3, 
-    dimensions => [ [ 0, 100],[0, 100] ] 
-);
-$u->escavate;
-print $u->to_string;
+    dimensions => [ [ 0, 50],[0, 50] ],
+    grid => $grid,
+)->escavate;
 
-
-$u = Games::MapMaker::Dungeon->new( 
+Games::DungeonBuilder::Dungeon->new( 
     target_density => 0.3, 
     room_factor => 8/10,
-    dimensions => [ [ 0, 100],[0, 100] ] 
-);
-$u->escavate;
-print $u->to_string;
+    dimensions => [ [ 0, 50],[51, 100] ],
+    grid => $grid,
+)->escavate;
+
+print $grid->to_string;
 
 

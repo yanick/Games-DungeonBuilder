@@ -1,10 +1,12 @@
-package Games::DungeonBuilder::Cave;
+package Games::DungeonBuilder::Dungeon;
+
+use strict;
 
 use Moose;
 
-no warnings qw/ uninitialized /;
+no warnings;
 
-extends qw/ Games::DungeonBuilder::Base /;
+extends 'Games::DungeonBuilder::Base';
 
 sub create_room {
     my ( $self, $location ) = @_;
@@ -14,8 +16,20 @@ sub create_room {
         $location->[0] = $d->[0][0] + int rand( $d->[0][1] - $d->[0][0] );
         $location->[1] = $d->[1][0] + int rand( $d->[1][1] - $d->[1][0] );
     }
-        
-    my @dig = ( $location );
+
+    my $width = 1;
+    $width++ while rand() < $self->room_factor;
+
+    my $height = 1;
+    $height++ while rand() < $self->room_factor;
+
+
+    my @dig;
+    for my $x ( $location->[0]..$location->[0] + $width ) {
+        for my $y ( $location->[1]..$location->[1] + $height ) {
+            push @dig, [ $x, $y ];
+        }
+    }
 
     my @system;
     for my $x ( keys %{ $self->grid } ) {
@@ -36,8 +50,6 @@ sub create_room {
         push @cave, [$x,$y];
 
         $connected ||= grep { $self->grid->{$_->[0]}{$_->[1]} == 1 } $self->surrounding($x,$y);
-
-        push @dig, grep { rand() < $self->room_factor } $self->surrounding( $x, $y );
     }
 
     # do they need to be connected?
@@ -52,11 +64,14 @@ sub create_room {
     }
 }
 
+
 sub tunnel {
     my ( $self, $src, $dst ) = @_;
 
+    my $index = rand() < 0.5 ? 0 : 1;
+
     until( $self->grid->{ $src->[0] }{ $src->[1] } == 1 ) {
-        my $index = rand() < 0.5;
+        $index = !$index if $src->[$index] == $dst->[$index];
         $src->[$index] += $src->[$index] > $dst->[$index] ? -1 : 1;
         $self->grid->{$src->[0]}{$src->[1]} ||= 2;
     }
@@ -66,3 +81,6 @@ sub tunnel {
 __PACKAGE__->meta->make_immutable;
 
 1;
+
+
+
