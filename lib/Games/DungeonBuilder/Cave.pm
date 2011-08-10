@@ -1,16 +1,23 @@
 package Games::DungeonBuilder::Cave;
 
+use strict;
+
 use Moose;
+use Method::Signatures;
 
-no warnings qw/ uninitialized /;
+no warnings;
 
-extends qw/ Games::DungeonBuilder::Base /;
+with 'Games::DungeonBuilder::Digger';
 
-sub create_room {
-    my ( $self, $location ) = @_;
+has room_factor => (
+    is => 'rw',
+    default => 0.4,
+);
+
+method create_room ( $location = undef ) {
 
     unless ( $location ) {
-        my $d = $self->dimensions;
+        my $d = $self->region;
         $location->[0] = $d->[0][0] + int rand( $d->[0][1] - $d->[0][0] );
         $location->[1] = $d->[1][0] + int rand( $d->[1][1] - $d->[1][0] );
     }
@@ -52,8 +59,7 @@ sub create_room {
     }
 }
 
-sub tunnel {
-    my ( $self, $src, $dst ) = @_;
+method tunnel( $src, $dst ) {
 
     until( $self->grid->{ $src->[0] }{ $src->[1] } == 1 ) {
         my $index = rand() < 0.5;

@@ -1,16 +1,19 @@
 package Games::DungeonBuilder::Grid;
 
+use strict;
+no warnings;
+
 use List::MoreUtils qw/ minmax /;
 
 use Moose;
+use Method::Signatures;
 
-sub to_string {
-    my $self = shift;
+no warnings;
 
+method to_string {
     my $output;
 
     my ( $minx, $maxx ) = minmax keys %$self;
-
     my ( $miny, $maxy ) = minmax  map { keys %$_ } values %$self;
 
     for my $y ( $miny-1..$maxy+1 ) {

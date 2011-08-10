@@ -3,16 +3,21 @@ package Games::DungeonBuilder::Dungeon;
 use strict;
 
 use Moose;
+use Method::Signatures;
 
 no warnings;
 
-extends 'Games::DungeonBuilder::Base';
+with 'Games::DungeonBuilder::Digger';
 
-sub create_room {
-    my ( $self, $location ) = @_;
+has room_factor => (
+    is => 'rw',
+    default => 0.4,
+);
+
+method create_room ( $location = undef ) {
 
     unless ( $location ) {
-        my $d = $self->dimensions;
+        my $d = $self->region;
         $location->[0] = $d->[0][0] + int rand( $d->[0][1] - $d->[0][0] );
         $location->[1] = $d->[1][0] + int rand( $d->[1][1] - $d->[1][0] );
     }
@@ -22,7 +27,6 @@ sub create_room {
 
     my $height = 1;
     $height++ while rand() < $self->room_factor;
-
 
     my @dig;
     for my $x ( $location->[0]..$location->[0] + $width ) {
@@ -65,9 +69,7 @@ sub create_room {
 }
 
 
-sub tunnel {
-    my ( $self, $src, $dst ) = @_;
-
+method tunnel ( $src, $dst ) {
     my $index = rand() < 0.5 ? 0 : 1;
 
     until( $self->grid->{ $src->[0] }{ $src->[1] } == 1 ) {
